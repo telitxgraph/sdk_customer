@@ -1,0 +1,7 @@
+menu "TELIT Sample Code"
+
+config PACKAGE_mps_atcmd_test
+	bool "mps-atcmd-test"
+	default y
+	help
+		This is mps at command test package.

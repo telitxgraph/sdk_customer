@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+incudedir=@includedir@
+
+Name: mps_qmi_test
+Description: Telit mps_qmi_test
+Version: @VERSION@
+Libs: -L${libdir}
+Cflags: -I${includedir}/mps_qmi_test

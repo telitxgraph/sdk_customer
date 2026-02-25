@@ -1,0 +1,5 @@
+config PACKAGE_mps_qmi_test
+	tristate "MPs QMI Test"
+	depends on PACKAGE_diag && PACKAGE_qmiservices && PACKAGE_qmiidl && PACKAGE_qmi && PACKAGE_qmi-framework && PACKAGE_libqcmap_client && PACKAGE_libqcmaputils && PACKAGE_libqmi && PACKAGE_libqmi-ip && PACKAGE_dsutils
+	help
+		MPs QMI Test utility for Telit modules.

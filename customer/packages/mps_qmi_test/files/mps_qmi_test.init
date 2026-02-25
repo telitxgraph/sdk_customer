@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+USE_PROCD=1
+
+NAME=mps_qmi_test
+PROG=/usr/bin/mps_qmi_test
+
+start_service() {
+	echo "[$NAME] Starting ..." > /dev/kmsg
+	procd_open_instance
+	procd_set_param command "$PROG"
+	procd_set_param respawn			# auto restart if process killed
+	procd_set_param stdout 1		# standard output log
+	procd_set_param stderr 1		# standard error log
+	procd_close_instance
+}
+
+stop_service() {
+	echo "[$NAME] Stopping ..." > /dev/kmsg	
+	killall -q $NAME 2>/dev/null
+}
+
+reload_service() {
+	echo "[$NAME] Reloading ..." > /dev/kmsg		
+	stop_service
+	start_service
+}
