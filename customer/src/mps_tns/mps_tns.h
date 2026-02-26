@@ -10,6 +10,8 @@
 
 #include <syslog.h>
 #include <stdarg.h>
+#include <string.h>
+#include <time.h>
 #include <signal.h>
 #include <asm-generic/signal-defs.h>
 
@@ -25,16 +27,27 @@
 
 static void log_to_syslog(int priority, const char *file, int line, const char *func, const char *fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
+ 	va_list args;
+ 	struct timespec ts;
+ 	struct tm tm_info;
+ 	char time_buf[32];
 
-	char buffer[512];
-	snprintf(buffer, sizeof(buffer), "[TNS][%s:%d] %s() ", file, line, func);
-	vsnprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), fmt, args);
-	syslog(priority, "%s", buffer);
-	printf("%s\n", buffer);
+ 	clock_gettime(CLOCK_REALTIME, &ts);
+ 	localtime_r(&ts.tv_sec, &tm_info);
+ 	snprintf(time_buf, sizeof(time_buf), "%04d-%02d-%02d %02d:%02d:%02d.%03ld",
+ 	         tm_info.tm_year + 1900, tm_info.tm_mon + 1, tm_info.tm_mday,
+ 	         tm_info.tm_hour, tm_info.tm_min, tm_info.tm_sec,
+ 	         ts.tv_nsec / 1000000);
 
-	va_end(args);
+ 	va_start(args, fmt);
+
+ 	char buffer[512];
+ 	snprintf(buffer, sizeof(buffer), "[%s][%s:%d] %s() ", time_buf, file, line, func);
+ 	vsnprintf(buffer + strlen(buffer), sizeof(buffer) - strlen(buffer), fmt, args);
+ 	syslog(priority, "%s", buffer);
+ 	printf("%s\n", buffer);
+
+ 	va_end(args);
 }
 
 #define LOGE(fmt, ...) log_to_syslog(LOG_ERR, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
@@ -58,7 +71,6 @@ typedef unsigned char boolean;
 ===========================================================================*/
 
 #define TNS_SEND_TIMEOUT        50000
-#define TNS_CONFIG_FILE_PATH    "/etc/tns/tns_config.conf"
 #define TNS_CLIENT_CB_DATA      0xBEEF
 
 /*===========================================================================
@@ -78,8 +90,7 @@ typedef struct {
                               FUNCTION DECLARATIONS
 ===========================================================================*/
 
-/* Config file operations */
-int  tns_config_load(const char *path, tns_sync_pulse_config_t *config);
+/* Config operations */
 void tns_config_set_defaults(tns_sync_pulse_config_t *config);
 
 #endif /* __MPS_TNS_H__ */
