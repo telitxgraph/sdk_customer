@@ -1,0 +1,6 @@
+config PACKAGE_nas_nr5g_indications
+	tristate "TNS (Time Network Synchronization)"
+	depends on PACKAGE_diag && PACKAGE_qmiservices && PACKAGE_qmiidl && PACKAGE_qmi && PACKAGE_qmi-framework && PACKAGE_libqcmap_client && PACKAGE_libqcmaputils && PACKAGE_libqmi && PACKAGE_libqmi-ip && PACKAGE_dsutils
+	help
+		TNS (Time Network Synchronization) application for Telit modules.
+		Monitors NR5G SIB9 time synchronization using QMI NAS messages.
