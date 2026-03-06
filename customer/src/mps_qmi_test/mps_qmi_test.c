@@ -481,6 +481,16 @@ static void register_for_nas_indication(qmi_client_type client_handle)
   */  
   config_sig_info_req->lte_rsrq_delta_valid = 1;
   config_sig_info_req->lte_rsrq_delta = 10;
+
+  config_sig_info_req->nr5g_rsrp_delta_valid = 1;
+  config_sig_info_req->nr5g_rsrp_delta = 10;   /* 1.0 dBm (units of 0.1 dBm) */
+
+  config_sig_info_req->nr5g_rsrq_delta_valid = 1;
+  config_sig_info_req->nr5g_rsrq_delta = 10;   /* 1.0 dB (units of 0.1 dB) */
+
+  config_sig_info_req->nr5g_snr_delta_valid = 1;
+  config_sig_info_req->nr5g_snr_delta = 10;    /* 1.0 dB (units of 0.1 dB) */
+
   qmi_err = qmi_client_send_msg_sync(client_handle, QMI_NAS_CONFIG_SIG_INFO2_REQ_MSG_V01,
                                     (void *)config_sig_info_req, sizeof(nas_config_sig_info2_req_msg_v01),
                                     (void *)config_sig_info_resp, sizeof(nas_config_sig_info2_resp_msg_v01),
@@ -900,13 +910,35 @@ static void qmi_nas_client_test_ind_cb(
      return;
     }
 
+    LOGI("=== Signal Info Indication ===");
+
     if (nas_sig_ind.lte_sig_info_valid)
     {
        LOGI("[LTE] RSSI : %hd", nas_sig_ind.lte_sig_info.rssi);
        LOGI("[LTE] RSRQ : %hd", nas_sig_ind.lte_sig_info.rsrq);
        LOGI("[LTE] RSRP : %hd", nas_sig_ind.lte_sig_info.rsrp);
-       LOGI("[LTE] SNR  : %hd", nas_sig_ind.lte_sig_info.snr);
+       LOGI("[LTE] SNR  : %hd (x0.1 dB)", nas_sig_ind.lte_sig_info.snr);
     }
+
+    if (nas_sig_ind.nr5g_sig_info_valid)
+    {
+       LOGI("[NR5G] RSRP : %hd dBm", nas_sig_ind.nr5g_sig_info.rsrp);
+       LOGI("[NR5G] SNR  : %hd (x0.1 dB)", nas_sig_ind.nr5g_sig_info.snr);
+    }
+
+    if (nas_sig_ind.nr5g_rsrq_valid)
+    {
+       LOGI("[NR5G] RSRQ : %hd dB", nas_sig_ind.nr5g_rsrq);
+    }
+
+    if (nas_sig_ind.nrdc_sig_info_valid)
+    {
+       LOGI("[NR-DC] RSRP : %hd dBm", nas_sig_ind.nrdc_sig_info.rsrp);
+       LOGI("[NR-DC] RSRQ : %hd dB", nas_sig_ind.nrdc_sig_info.rsrq);
+       LOGI("[NR-DC] SNR  : %hd (x0.1 dB)", nas_sig_ind.nrdc_sig_info.snr);
+    }
+
+    LOGI("==============================");
     break;
 
     default:

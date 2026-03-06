@@ -25,6 +25,19 @@
                               LOGGING MACROS
 ===========================================================================*/
 
+#ifdef FEATURE_ENABLE_LOGGING_TO_SYSLOG
+
+/**
+ * @brief  Log a message to syslog with timestamp and source location.
+ * @param  priority  syslog priority (LOG_ERR, LOG_INFO, LOG_DEBUG)
+ * @param  file      source file name (__FILE__)
+ * @param  line      source line number (__LINE__)
+ * @param  func      function name (__FUNCTION__)
+ * @param  fmt       printf-style format string
+ * @param  ...       variable arguments for format string
+ * @return None
+ */
+
 static void log_to_syslog(int priority, const char *file, int line, const char *func, const char *fmt, ...)
 {
  	va_list args;
@@ -50,19 +63,34 @@ static void log_to_syslog(int priority, const char *file, int line, const char *
  	va_end(args);
 }
 
-#define LOGE(fmt, ...) log_to_syslog(LOG_ERR, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
-#define LOGI(fmt, ...) log_to_syslog(LOG_INFO, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
-#define LOGD(fmt, ...) log_to_syslog(LOG_DEBUG, __FILE__, __LINE__, __FUNCTION__, fmt, ##__VA_ARGS__)
+#define LOGE( fmt, ... ) \
+  log_to_syslog( LOG_ERR, __FILE__, __LINE__, __FUNCTION__, \
+                 fmt, ##__VA_ARGS__ )
+#define LOGI( fmt, ... ) \
+  log_to_syslog( LOG_INFO, __FILE__, __LINE__, __FUNCTION__, \
+                 fmt, ##__VA_ARGS__ )
+#define LOGD( fmt, ... ) \
+  log_to_syslog( LOG_DEBUG, __FILE__, __LINE__, __FUNCTION__, \
+                 fmt, ##__VA_ARGS__ )
 
+#else /* !FEATURE_ENABLE_LOGGING_TO_SYSLOG */
+
+#define LOGE( fmt, ... ) printf( "[ERROR] " fmt "\n", ##__VA_ARGS__ )
+#define LOGI( fmt, ... ) printf( "[INFO ] " fmt "\n", ##__VA_ARGS__ )
+#define LOGD( fmt, ... ) printf( "[DEBUG] " fmt "\n", ##__VA_ARGS__ )
+
+#endif /* !FEATURE_ENABLE_LOGGING_TO_SYSLOG */
 
 #define strlcpy g_strlcpy
 #define strlcat g_strlcat
+
+/*===========================================================================
+                              TYPE DEFINITIONS
+===========================================================================*/
+
 typedef unsigned char boolean;
-#if !defined(true)
-#define true	1
-#endif
-#if !defined(false)
-#define false	0
-#endif
+#define TRUE  1
+#define FALSE 0
+
 
 #endif
