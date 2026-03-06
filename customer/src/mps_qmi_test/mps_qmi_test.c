@@ -475,8 +475,12 @@ static void register_for_nas_indication(qmi_client_type client_handle)
   LOGI("Indication register request is success.");
 
   // sig_info
+  /**<   RSRQ delta (in units of 0.1 dBm). \n
+      For example, to set a delta of 10 dBm, the delta value must be set
+      to 100. A value of 0 is rejected with a QMI_ERR_INVALID_ARG error.
+  */  
   config_sig_info_req->lte_rsrq_delta_valid = 1;
-  config_sig_info_req->lte_rsrq_delta = 0x0a;
+  config_sig_info_req->lte_rsrq_delta = 10;
   qmi_err = qmi_client_send_msg_sync(client_handle, QMI_NAS_CONFIG_SIG_INFO2_REQ_MSG_V01,
                                     (void *)config_sig_info_req, sizeof(nas_config_sig_info2_req_msg_v01),
                                     (void *)config_sig_info_resp, sizeof(nas_config_sig_info2_resp_msg_v01),
@@ -827,7 +831,8 @@ static void qmi_nas_client_test_ind_cb(
       nas_convert_nw_name(nitz_long, sizeof(nitz_long),
                           op_ind.nitz_information.long_name,
                           op_ind.nitz_information.long_name_len,
-                          op_ind.nitz_information.coding_scheme);
+                          op_ind.nitz_information.coding_scheme,
+                          op_ind.nitz_information.long_name_spare_bits);
       LOGI("  NITZ Long Name     : %s", nitz_long);
      }
      if (op_ind.nitz_information.short_name_len > 0)
@@ -836,7 +841,8 @@ static void qmi_nas_client_test_ind_cb(
       nas_convert_nw_name(nitz_short, sizeof(nitz_short),
                           op_ind.nitz_information.short_name,
                           op_ind.nitz_information.short_name_len,
-                          op_ind.nitz_information.coding_scheme);
+                          op_ind.nitz_information.coding_scheme,
+                          op_ind.nitz_information.short_name_spare_bits);
       LOGI("  NITZ Short Name    : %s", nitz_short);
      }
     }
@@ -857,7 +863,8 @@ static void qmi_nas_client_test_ind_cb(
        nas_convert_nw_name(pnn_long, sizeof(pnn_long),
                            op_ind.plmn_network_name[idx].long_name,
                            op_ind.plmn_network_name[idx].long_name_len,
-                           op_ind.plmn_network_name[idx].coding_scheme);
+                           op_ind.plmn_network_name[idx].coding_scheme,
+                           op_ind.plmn_network_name[idx].long_name_spare_bits);
        LOGI("    [%u] Long Name   : %s", idx, pnn_long);
       }
       if (op_ind.plmn_network_name[idx].short_name_len > 0)
@@ -866,7 +873,8 @@ static void qmi_nas_client_test_ind_cb(
        nas_convert_nw_name(pnn_short, sizeof(pnn_short),
                            op_ind.plmn_network_name[idx].short_name,
                            op_ind.plmn_network_name[idx].short_name_len,
-                           op_ind.plmn_network_name[idx].coding_scheme);
+                           op_ind.plmn_network_name[idx].coding_scheme,
+                           op_ind.plmn_network_name[idx].short_name_spare_bits);
        LOGI("    [%u] Short Name  : %s", idx, pnn_short);
       }
      }
